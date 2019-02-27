@@ -37,6 +37,9 @@
           <b-col class="text-right" cols="11">
             <b-button variant="danger" @click="addWork">+ Thêm</b-button>
             <b-button variant="success">x Xóa</b-button>
+            <template v-if="isEdit">
+              <b-button variant="outline-primary" @click="saveEdit">OK</b-button>
+            </template>
           </b-col>
         </b-row>
 
@@ -44,7 +47,7 @@
     </div>
     <div class="hello mt-2">
       <div class="text-left">Danh sách công việc</div>
-      <div class="text-left mt-2">2 công việc</div>
+      <div class="text-left mt-2">{{this.items.length}} công việc</div>
       <b-row align-self="end">
         <b-col class="text-right" cols="11">
           <b-dropdown class="mlr" id="ddown1" size="sm" split text="Tất Cả" variant="outline-primary">
@@ -65,7 +68,7 @@
         </template>
         <template slot="Action" slot-scope="data">
           <b-button variant="outline-secondary" size="sm" @click="changeStatus(data.index, 'Hoàn Thành')">Hoàn thành</b-button>
-          <b-button variant="outline-secondary" size="sm">Chỉnh sửa</b-button>
+          <b-button variant="outline-secondary" size="sm" @click="editable(data.index)">Chỉnh sửa</b-button>
           <b-button variant="outline-secondary" size="sm" @click="removeItem(data.index)">Xóa</b-button>
         </template>
       </b-table>
@@ -91,7 +94,8 @@ export default {
       ],
       dropDownPicked: '1 - Cao',
       dropDownPicked_data: 1,
-
+      isEdit: false,
+      indexEdit: '',
 
     }
   },
@@ -105,16 +109,41 @@ export default {
       // console.log(this.items[0]['Trạng Thái'] = 'AAA')
     },
     dropDownPickedFunc: function(a) {
+      console.log(a);
       this.dropDownPicked = `${this.levels[a].nameLvl}`;
-      this.dropDownPicked_data = a > 0 ? ++a : a;
+      this.dropDownPicked_data = this.levels[a].index;
     },
     removeItem: function(a){
       this.items.splice(a, 1);
     },
     changeStatus: function(a, stt){
       this.items[a]['Trạng Thái'] = stt;
+    },
+    editable: function(a){
+      this.txt_title = this.items[a]['Tiêu đề'];
+      this.dropDownPickedFunc(this.items[a]['Độ ưu tiên'] - 1); 
+      this.isEdit = true;
+      this.indexEdit = a;
+    },
+    saveEdit: function(){
+      this.items[this.indexEdit]['Tiêu đề'] = this.txt_title; 
+      this.items[this.indexEdit]['Độ ưu tiên'] = this.dropDownPicked_data;
+      this.isEdit = false;
+      this.clearTextBox();
+    },
+    clearTextBox: function(){
+      console.log('SSS')
+      this.indexEdit = '';
+      this.txt_title = '';
+      this.dropDownPicked_data = 1;
+      this.txt_description = '';
     }
+    
 
+
+  },
+  computed: {
+    
   }
 }
 </script>
